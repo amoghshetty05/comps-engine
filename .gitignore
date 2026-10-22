@@ -1,0 +1,25 @@
+# Secrets
+.env
+.env.local
+web/.env.local
+
+# Node / Next.js
+node_modules/
+web/node_modules/
+web/.next/
+web/out/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local data caches
+ingest/cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

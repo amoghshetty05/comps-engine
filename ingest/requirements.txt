@@ -1,0 +1,6 @@
+psycopg[binary]>=3.2
+pymongo>=4.8
+python-dotenv>=1.0
+yfinance>=0.2.40
+sentence-transformers>=3.0
+pgvector>=0.3
