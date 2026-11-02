@@ -1,6 +1,10 @@
 // Every database read the app makes lives here, so the API routes and the
 // server-rendered pages share exactly the same SQL and MongoDB queries.
-import { query } from "./db";
+import { query as rawQuery } from "./db";
+
+// Market data is read as the read-only database role; admin-only data as app_admin.
+const query = (text, params = []) => rawQuery(text, params, "app_analyst");
+const adminQuery = (text, params = []) => rawQuery(text, params, "app_admin");
 import { dealsCollection } from "./mongo";
 
 // Sort keys the user may pick, mapped to SQL. Column names cannot be passed
@@ -105,7 +109,7 @@ export async function dealsBySectorYear() {
 
 // ---------------------------------------------------------------- admin
 export async function auditLog(limit = 40) {
-  return query(
+  return adminQuery(
     `SELECT a.log_id, a.table_name, a.operation, a.record_id, a.changed_at,
             a.old_data, a.new_data, u.email AS changed_by
        FROM audit_log a LEFT JOIN users u ON u.user_id = a.changed_by

@@ -18,9 +18,10 @@ const Body = z.object({
   market_cap: optNum,
 });
 
-// POST /api/admin/financials -> record_financials() in ONE transaction.
-// The admin's user id is put in app.user_id for that transaction, so the
-// audit trigger records exactly who changed what.
+// POST /api/admin/financials -> record_financials() in ONE transaction,
+// running as the app_admin database role. The admin's user id is put in
+// app.user_id for that transaction, so the audit trigger records exactly
+// who changed what.
 export async function POST(req) {
   const { session, error } = await requireRole("admin");
   if (error) return error;
@@ -45,13 +46,17 @@ export async function POST(req) {
          b.total_debt, b.cash, b.total_equity, b.price, b.market_cap]
       );
       return { status: 200, body: { ok: true, message: `Saved FY${b.fiscal_year} for ${b.ticker.toUpperCase()}` } };
-    }, session.userId);
+    }, { role: "app_admin", userId: session.userId });
     return Response.json(result.body, { status: result.status });
   } catch (err) {
     // Constraint and trigger errors (codes 23xxx, or P0001 from RAISE) are
     // the user's input being rejected; anything else is a real server error.
     if (err.code?.startsWith("23") || err.code === "P0001") {
       return Response.json({ error: `Rejected by the database: ${err.message}` }, { status: 400 });
+    }
+    // 42501 = insufficient_privilege: the database role itself said no.
+    if (err.code === "42501") {
+      return Response.json({ error: `Database permission denied: ${err.message}` }, { status: 403 });
     }
     throw err;
   }
