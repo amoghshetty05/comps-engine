@@ -15,9 +15,6 @@ __pycache__/
 .venv/
 venv/
 
-# Local data caches
-ingest/cache/
-
 # OS / editor
 .DS_Store
 Thumbs.db

@@ -1,0 +1,100 @@
+// Paste this whole file into https://dbdiagram.io/d to get the ER diagram.
+// Export as PNG/PDF from there for your documentation.
+
+Table sectors {
+  sector_id serial [pk]
+  name varchar(80) [not null, unique]
+  uses_ev_multiples boolean [not null, default: true, note: 'FALSE for banks']
+}
+
+Table companies {
+  company_id serial [pk]
+  ticker varchar(20) [not null, unique]
+  name varchar(150) [not null]
+  sector_id int [not null, ref: > sectors.sector_id]
+  exchange varchar(5) [not null, default: 'NSE', note: "CHECK IN ('NSE','BSE')"]
+  currency char(3) [not null, default: 'INR']
+  description text
+  description_tsv tsvector [note: 'generated, GIN indexed']
+  isin varchar(12) [note: 'added by 05_alter_demo.sql']
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+
+Table financial_statements {
+  statement_id serial [pk]
+  company_id int [not null, ref: > companies.company_id]
+  fiscal_year int [not null]
+  revenue numeric(18,2) [not null, note: 'CHECK >= 0, INR crore']
+  ebitda numeric(18,2)
+  net_income numeric(18,2)
+  total_debt numeric(18,2) [not null, note: 'CHECK >= 0']
+  cash numeric(18,2) [not null, note: 'CHECK >= 0']
+  total_equity numeric(18,2)
+  created_at timestamptz [not null]
+
+  indexes {
+    (company_id, fiscal_year) [unique]
+  }
+}
+
+Table market_data {
+  market_id serial [pk]
+  company_id int [not null, ref: > companies.company_id]
+  as_of_date date [not null]
+  price numeric(14,2) [not null, note: 'CHECK > 0']
+  market_cap numeric(18,2) [not null, note: 'CHECK > 0']
+  shares_outstanding bigint
+
+  indexes {
+    (company_id, as_of_date) [unique]
+  }
+}
+
+Table users {
+  user_id serial [pk]
+  email varchar(255) [not null, unique]
+  password_hash varchar(100) [not null, note: 'bcrypt']
+  full_name varchar(120) [not null]
+  role varchar(10) [not null, default: 'analyst', note: "CHECK IN ('admin','analyst')"]
+  created_at timestamptz [not null]
+}
+
+Table comp_sets {
+  set_id serial [pk]
+  user_id int [not null, ref: > users.user_id]
+  target_company_id int [not null, ref: > companies.company_id]
+  name varchar(120) [not null]
+  created_at timestamptz [not null]
+
+  indexes {
+    (user_id, name) [unique]
+  }
+}
+
+Table comp_set_members {
+  set_id int [not null, ref: > comp_sets.set_id]
+  company_id int [not null, ref: > companies.company_id]
+
+  indexes {
+    (set_id, company_id) [pk]
+  }
+}
+
+Table company_embeddings {
+  company_id int [pk, ref: - companies.company_id]
+  model_name varchar(100) [not null]
+  embedding vector(384) [not null, note: 'HNSW index, cosine']
+  created_at timestamptz [not null]
+}
+
+Table audit_log {
+  log_id bigserial [pk]
+  table_name varchar(63) [not null]
+  operation varchar(10) [not null]
+  record_id int
+  old_data jsonb
+  new_data jsonb
+  changed_by int [note: 'set from app.user_id; no FK so history survives user deletion']
+  changed_at timestamptz [not null]
+}
