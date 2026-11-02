@@ -63,7 +63,14 @@ DBMS Experiential Learning Level 3 project, PES University.
    `python ingest/load_financials.py --offline`.
    Use `--refresh` to re-download, or `--only TCS.NS INFY.NS` for specific tickers.
 
-Later phases (embeddings, MongoDB deals, web app) will add their own steps below.
+8. Build the semantic-similarity vectors (first run downloads a ~90 MB model):
+   ```bash
+   python ingest/embed.py
+   ```
+   It prints each company's three nearest neighbours. Search by meaning with:
+   `python ingest/embed.py --query "online food delivery"`
+
+Later phases (MongoDB deals, web app) will add their own steps below.
 
 ## Database files (`db/`)
 
