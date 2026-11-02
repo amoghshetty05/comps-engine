@@ -1,0 +1,132 @@
+[
+  {
+    "ticker": "ETERNAL.NS",
+    "date": "2020-01-21",
+    "type": "acquisition",
+    "headline": "Zomato acquires Uber Eats India",
+    "summary": "All-stock deal: Uber received a 9.99% stake in Zomato in exchange for its Indian food delivery business, removing a well-funded competitor.",
+    "tags": ["food delivery", "consolidation", "all-stock"],
+    "deal": {"target": "Uber Eats India", "consideration": "stock", "value_usd_mn": 350, "stake_issued_pct": 9.99}
+  },
+  {
+    "ticker": "ETERNAL.NS",
+    "date": "2022-06-24",
+    "type": "acquisition",
+    "headline": "Zomato acquires Blinkit (formerly Grofers)",
+    "summary": "All-stock acquisition of the quick-commerce company Blinkit, which became Zomato's main growth engine.",
+    "tags": ["quick commerce", "all-stock", "related party"],
+    "deal": {"target": "Blinkit Commerce", "consideration": "stock", "value_inr_cr": 4447}
+  },
+  {
+    "ticker": "ETERNAL.NS",
+    "date": "2024-08-21",
+    "type": "acquisition",
+    "headline": "Zomato buys Paytm's entertainment ticketing business",
+    "summary": "Cash acquisition of Paytm Insider and TicketNew, forming the base of Zomato's 'District' going-out app.",
+    "tags": ["ticketing", "going-out", "cash"],
+    "deal": {"target": "Orbgen Technologies and Wasteland Entertainment (Paytm)", "consideration": "cash", "value_inr_cr": 2048}
+  },
+  {
+    "ticker": "ETERNAL.NS",
+    "date": "2024-11-25",
+    "type": "fundraise",
+    "headline": "Zomato raises Rs 8,500 crore through a QIP",
+    "summary": "Qualified institutional placement to strengthen the balance sheet amid quick-commerce competition.",
+    "tags": ["QIP", "equity raise"],
+    "raise": {"instrument": "QIP", "amount_inr_cr": 8500}
+  },
+  {
+    "ticker": "SWIGGY.NS",
+    "date": "2022-05-13",
+    "type": "acquisition",
+    "headline": "Swiggy acquires Dineout from Times Internet",
+    "summary": "Acquisition of the restaurant discovery and table-booking platform, taking Swiggy into dine-out alongside delivery.",
+    "tags": ["dining out", "restaurant tech"],
+    "deal": {"target": "Dineout (Times Internet)", "consideration": "stock", "value_usd_mn": 200},
+    "source_url": "https://www.businesstoday.in/latest/corporate/story/swiggy-to-acquire-dineout-from-times-internet-333488-2022-05-13"
+  },
+  {
+    "ticker": "SWIGGY.NS",
+    "date": "2024-11-13",
+    "type": "ipo",
+    "headline": "Swiggy lists on NSE and BSE after Rs 11,327 crore IPO",
+    "summary": "One of India's largest internet IPOs, combining a fresh issue with an offer for sale by early investors.",
+    "tags": ["IPO", "listing"],
+    "ipo": {"issue_size_inr_cr": 11327, "listing_date": "2024-11-13", "exchanges": ["NSE", "BSE"]}
+  },
+  {
+    "ticker": "NYKAA.NS",
+    "date": "2021-11-10",
+    "type": "ipo",
+    "headline": "FSN E-Commerce (Nykaa) lists after Rs 5,352 crore IPO",
+    "summary": "Listed at a large premium, becoming one of the first profitable new-age tech companies to list in India.",
+    "tags": ["IPO", "listing", "beauty"],
+    "ipo": {"issue_size_inr_cr": 5352, "listing_date": "2021-11-10", "exchanges": ["NSE", "BSE"]}
+  },
+  {
+    "ticker": "POLICYBZR.NS",
+    "date": "2021-11-15",
+    "type": "ipo",
+    "headline": "PB Fintech (PolicyBazaar) lists after Rs 5,710 crore IPO",
+    "summary": "IPO of the insurance and credit marketplace operator behind PolicyBazaar and Paisabazaar.",
+    "tags": ["IPO", "listing", "insurtech"],
+    "ipo": {"issue_size_inr_cr": 5710, "listing_date": "2021-11-15", "exchanges": ["NSE", "BSE"]}
+  },
+  {
+    "ticker": "HDFCBANK.NS",
+    "date": "2022-04-04",
+    "type": "merger",
+    "headline": "HDFC Bank announces merger with parent HDFC Ltd",
+    "summary": "Reverse merger of India's largest housing finance company into its banking subsidiary, creating one of the world's most valuable banks.",
+    "tags": ["merger", "mortgage", "reverse merger"],
+    "merger": {"counterparty": "Housing Development Finance Corporation (HDFC Ltd)", "swap_ratio": "42 HDFC Bank shares for 25 HDFC shares", "effective_date": "2023-07-01"}
+  },
+  {
+    "ticker": "AXISBANK.NS",
+    "date": "2022-03-30",
+    "type": "acquisition",
+    "headline": "Axis Bank to acquire Citibank's India consumer business",
+    "summary": "Cash acquisition of Citi's Indian credit cards, retail banking, wealth and consumer loans businesses as Citi exited consumer banking in India.",
+    "tags": ["retail banking", "credit cards", "cash"],
+    "deal": {"target": "Citibank India consumer business", "consideration": "cash", "value_inr_cr": 12325, "completed_date": "2023-03-01"}
+  },
+  {
+    "ticker": "ICICIBANK.NS",
+    "date": "2023-06-29",
+    "type": "delisting",
+    "headline": "ICICI Bank board approves delisting of ICICI Securities via share swap",
+    "summary": "ICICI Securities to become a wholly owned subsidiary; public shareholders receive ICICI Bank shares. Completed in March 2025.",
+    "tags": ["delisting", "share swap", "subsidiary"],
+    "merger": {"counterparty": "ICICI Securities", "swap_ratio": "67 ICICI Bank shares for 100 ICICI Securities shares", "effective_date": "2025-03-24"},
+    "source_url": "https://www.business-standard.com/companies/news/icici-securities-to-be-100-subsidiary-of-icici-bank-upon-delisting-123062900748_1.html"
+  },
+  {
+    "ticker": "LTM.NS",
+    "date": "2022-05-06",
+    "type": "merger",
+    "headline": "L&T Infotech and Mindtree announce merger to form LTIMindtree",
+    "summary": "Merger of two L&T group IT services companies; the combined entity later renamed itself LTM Limited in 2026.",
+    "tags": ["merger", "IT services", "group consolidation"],
+    "merger": {"counterparty": "Mindtree", "swap_ratio": "73 LTI shares for 100 Mindtree shares", "effective_date": "2022-11-14"}
+  },
+  {
+    "ticker": "WIPRO.NS",
+    "date": "2021-03-04",
+    "type": "acquisition",
+    "headline": "Wipro to acquire Capco for USD 1.45 billion",
+    "summary": "Wipro's largest acquisition: a London-based consultancy serving banks and financial services firms.",
+    "tags": ["consulting", "BFSI", "cash", "cross-border"],
+    "deal": {"target": "Capco", "consideration": "cash", "value_usd_mn": 1450},
+    "source_url": "https://www.businesstoday.in/current/corporate/wipro-to-acquire-london-based-capco-for-145-billion/story/433007.html"
+  },
+  {
+    "ticker": "COFORGE.NS",
+    "date": "2024-05-02",
+    "type": "acquisition",
+    "headline": "Coforge to acquire a majority stake in Cigniti Technologies",
+    "summary": "Acquisition of up to 54% of the digital assurance and testing firm, via share purchases and an open offer.",
+    "tags": ["quality engineering", "majority stake", "open offer"],
+    "deal": {"target": "Cigniti Technologies", "consideration": "cash", "stake_pct": 54},
+    "source_url": "https://www.angelone.in/news/share-market/coforge-announces-acquisition-of-54-stake-in-cigniti"
+  }
+]

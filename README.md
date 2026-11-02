@@ -70,7 +70,14 @@ DBMS Experiential Learning Level 3 project, PES University.
    It prints each company's three nearest neighbours. Search by meaning with:
    `python ingest/embed.py --query "online food delivery"`
 
-Later phases (MongoDB deals, web app) will add their own steps below.
+9. Load deal news (M&A, IPOs, fundraises) into MongoDB:
+   ```bash
+   python ingest/load_deals.py
+   ```
+   Deals live in `ingest/deals.json` (hand-compiled from public announcements);
+   add more there and re-run. `--stats` prints only the aggregation results.
+
+Later phases (web app) will add their own steps below.
 
 ## Database files (`db/`)
 
