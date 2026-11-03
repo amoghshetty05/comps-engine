@@ -1,0 +1,51 @@
+graph ER {
+  layout=neato; overlap=false; sep="+14"; splines=true; bgcolor="white"; pad=0.3;
+  node [fontname="Helvetica", fontsize=11];
+  edge [color="#444444"];
+
+  // ---------- entities (strong = single box, weak = double box)
+  node [shape=box, style=filled, fillcolor="#e3efeb", color="#0f5c4d", penwidth=1.4];
+  SECTOR; COMPANY; USER; COMP_SET; AUDIT_LOG;
+  node [peripheries=2, fillcolor="#fdeee6", color="#9a3412"];
+  FINANCIAL_STATEMENT [label="FINANCIAL_STATEMENT\n(weak)"];
+  MARKET_SNAPSHOT [label="MARKET_SNAPSHOT\n(weak)"];
+  COMPANY_EMBEDDING [label="COMPANY_EMBEDDING\n(weak)"];
+
+  // ---------- relationships (identifying = double diamond)
+  node [shape=diamond, style=filled, fillcolor="#fff7d6", color="#8a6d00", peripheries=1, fontsize=10, penwidth=1.2];
+  BELONGS_TO; CREATES; TARGETS; INCLUDES;
+  node [peripheries=2];
+  REPORTS; PRICED_AT; DESCRIBED_BY;
+
+  // ---------- attributes
+  node [shape=ellipse, style=solid, color="#666666", fillcolor=white, peripheries=1, fontsize=10, penwidth=1];
+  s_id [label=<<u>sector_id</u>>]; s_name [label="name"]; s_ev [label="uses_ev_multiples"];
+  c_id [label=<<u>company_id</u>>]; c_tk [label="ticker (unique)"]; c_nm [label="name"]; c_desc [label="description"];
+  c_ev [label="enterprise_value", style=dashed]; c_pe [label="pe_ratio", style=dashed]; c_eve [label="ev_ebitda", style=dashed];
+  f_fy [label=<<u>fiscal_year</u> (partial)>]; f_rev [label="revenue"]; f_eb [label="ebitda"]; f_ni [label="net_income"]; f_dc [label="debt, cash, equity"];
+  m_dt [label=<<u>as_of_date</u> (partial)>]; m_p [label="price"]; m_mc [label="market_cap"];
+  e_v [label="embedding\n(384 values)", peripheries=2]; e_m [label="model_name"];
+  u_id [label=<<u>user_id</u>>]; u_em [label="email (unique)"]; u_pw [label="password_hash"]; u_rl [label="role"];
+  cs_id [label=<<u>set_id</u>>]; cs_nm [label="name"];
+  a_id [label=<<u>log_id</u>>]; a_op [label="operation"]; a_dt [label="old / new data"]; a_by [label="changed_by"];
+
+  // entity-attribute
+  SECTOR -- {s_id s_name s_ev};
+  COMPANY -- {c_id c_tk c_nm c_desc c_ev c_pe c_eve};
+  FINANCIAL_STATEMENT -- {f_fy f_rev f_eb f_ni f_dc};
+  MARKET_SNAPSHOT -- {m_dt m_p m_mc};
+  COMPANY_EMBEDDING -- {e_v e_m};
+  USER -- {u_id u_em u_pw u_rl};
+  COMP_SET -- {cs_id cs_nm};
+  AUDIT_LOG -- {a_id a_op a_dt a_by};
+
+  // relationships with cardinality; total participation = bold double line
+  edge [fontsize=10, fontcolor="#0f5c4d", fontname="Helvetica-Bold"];
+  COMPANY -- BELONGS_TO [label="N", penwidth=2.5]; BELONGS_TO -- SECTOR [label="1"];
+  COMPANY -- REPORTS [label="1"]; REPORTS -- FINANCIAL_STATEMENT [label="N", penwidth=2.5];
+  COMPANY -- PRICED_AT [label="1"]; PRICED_AT -- MARKET_SNAPSHOT [label="N", penwidth=2.5];
+  COMPANY -- DESCRIBED_BY [label="1"]; DESCRIBED_BY -- COMPANY_EMBEDDING [label="1", penwidth=2.5];
+  USER -- CREATES [label="1"]; CREATES -- COMP_SET [label="N", penwidth=2.5];
+  COMP_SET -- TARGETS [label="N", penwidth=2.5]; TARGETS -- COMPANY [label="1"];
+  COMP_SET -- INCLUDES [label="M"]; INCLUDES -- COMPANY [label="N"];
+}

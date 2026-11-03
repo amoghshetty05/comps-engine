@@ -1,0 +1,91 @@
+digraph schema {
+  graph [rankdir=LR, bgcolor="white", pad=0.3, nodesep=0.45, ranksep=1.1, fontname="Helvetica"];
+  node  [shape=plain, fontname="Helvetica", fontsize=11];
+  edge  [color="#555555", arrowhead=crow, arrowtail=tee, dir=both, penwidth=1.2];
+
+  sectors [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#0f5c4d">
+    <tr><td bgcolor="#0f5c4d" colspan="2"><font color="white"><b>sectors</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> sector_id</td><td align="left" port="pk">SERIAL</td></tr>
+    <tr><td align="left">name</td><td align="left">VARCHAR(80) UNIQUE</td></tr>
+    <tr><td align="left">uses_ev_multiples</td><td align="left">BOOLEAN</td></tr></table>>];
+
+  companies [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#0f5c4d">
+    <tr><td bgcolor="#0f5c4d" colspan="2"><font color="white"><b>companies</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> company_id</td><td align="left" port="pk">SERIAL</td></tr>
+    <tr><td align="left">ticker</td><td align="left">VARCHAR(20) UNIQUE</td></tr>
+    <tr><td align="left">name</td><td align="left">VARCHAR(150)</td></tr>
+    <tr><td align="left" port="fk"><b>FK</b> sector_id</td><td align="left">INT → sectors</td></tr>
+    <tr><td align="left">exchange</td><td align="left">CHECK NSE/BSE</td></tr>
+    <tr><td align="left">currency</td><td align="left">CHAR(3)</td></tr>
+    <tr><td align="left">description</td><td align="left">TEXT</td></tr>
+    <tr><td align="left">description_tsv</td><td align="left">TSVECTOR (generated)</td></tr>
+    <tr><td align="left">isin</td><td align="left">VARCHAR(12)</td></tr>
+    <tr><td align="left">created_at, updated_at</td><td align="left">TIMESTAMPTZ</td></tr></table>>];
+
+  financial_statements [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#9a3412">
+    <tr><td bgcolor="#9a3412" colspan="2"><font color="white"><b>financial_statements</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> statement_id</td><td align="left">SERIAL</td></tr>
+    <tr><td align="left" port="fk"><b>FK</b> company_id</td><td align="left">INT → companies</td></tr>
+    <tr><td align="left">fiscal_year</td><td align="left">INT  UNIQUE(company_id, fiscal_year)</td></tr>
+    <tr><td align="left">revenue</td><td align="left">NUMERIC  CHECK ≥ 0</td></tr>
+    <tr><td align="left">ebitda, net_income</td><td align="left">NUMERIC</td></tr>
+    <tr><td align="left">total_debt, cash</td><td align="left">NUMERIC  CHECK ≥ 0</td></tr>
+    <tr><td align="left">total_equity</td><td align="left">NUMERIC</td></tr></table>>];
+
+  market_data [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#9a3412">
+    <tr><td bgcolor="#9a3412" colspan="2"><font color="white"><b>market_data</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> market_id</td><td align="left">SERIAL</td></tr>
+    <tr><td align="left" port="fk"><b>FK</b> company_id</td><td align="left">INT → companies</td></tr>
+    <tr><td align="left">as_of_date</td><td align="left">DATE  UNIQUE(company_id, as_of_date)</td></tr>
+    <tr><td align="left">price, market_cap</td><td align="left">NUMERIC  CHECK &gt; 0</td></tr>
+    <tr><td align="left">shares_outstanding</td><td align="left">BIGINT</td></tr></table>>];
+
+  company_embeddings [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#9a3412">
+    <tr><td bgcolor="#9a3412" colspan="2"><font color="white"><b>company_embeddings</b></font></td></tr>
+    <tr><td align="left" port="fk"><b>PK, FK</b> company_id</td><td align="left">INT → companies</td></tr>
+    <tr><td align="left">model_name</td><td align="left">VARCHAR(100)</td></tr>
+    <tr><td align="left">embedding</td><td align="left">VECTOR(384)  HNSW index</td></tr>
+    <tr><td align="left">created_at</td><td align="left">TIMESTAMPTZ</td></tr></table>>];
+
+  users [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#0f5c4d">
+    <tr><td bgcolor="#0f5c4d" colspan="2"><font color="white"><b>users</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> user_id</td><td align="left" port="pk">SERIAL</td></tr>
+    <tr><td align="left">email</td><td align="left">VARCHAR(255) UNIQUE</td></tr>
+    <tr><td align="left">password_hash</td><td align="left">VARCHAR(100) bcrypt</td></tr>
+    <tr><td align="left">full_name</td><td align="left">VARCHAR(120)</td></tr>
+    <tr><td align="left">role</td><td align="left">CHECK admin/analyst</td></tr>
+    <tr><td align="left">created_at</td><td align="left">TIMESTAMPTZ</td></tr></table>>];
+
+  comp_sets [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#0f5c4d">
+    <tr><td bgcolor="#0f5c4d" colspan="2"><font color="white"><b>comp_sets</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> set_id</td><td align="left" port="pk">SERIAL</td></tr>
+    <tr><td align="left" port="fk1"><b>FK</b> user_id</td><td align="left">INT → users</td></tr>
+    <tr><td align="left" port="fk2"><b>FK</b> target_company_id</td><td align="left">INT → companies</td></tr>
+    <tr><td align="left">name</td><td align="left">UNIQUE(user_id, name)</td></tr>
+    <tr><td align="left">created_at</td><td align="left">TIMESTAMPTZ</td></tr></table>>];
+
+  comp_set_members [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#555555">
+    <tr><td bgcolor="#555555" colspan="2"><font color="white"><b>comp_set_members</b>  (M:N)</font></td></tr>
+    <tr><td align="left" port="fk1"><b>PK, FK</b> set_id</td><td align="left">INT → comp_sets</td></tr>
+    <tr><td align="left" port="fk2"><b>PK, FK</b> company_id</td><td align="left">INT → companies</td></tr></table>>];
+
+  audit_log [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#555555">
+    <tr><td bgcolor="#555555" colspan="2"><font color="white"><b>audit_log</b>  (filled by triggers)</font></td></tr>
+    <tr><td align="left"><b>PK</b> log_id</td><td align="left">BIGSERIAL</td></tr>
+    <tr><td align="left">table_name, operation</td><td align="left">CHECK INSERT/UPDATE/DELETE</td></tr>
+    <tr><td align="left">record_id</td><td align="left">INT</td></tr>
+    <tr><td align="left">old_data, new_data</td><td align="left">JSONB</td></tr>
+    <tr><td align="left">changed_by</td><td align="left">INT (no FK)</td></tr>
+    <tr><td align="left">changed_at</td><td align="left">TIMESTAMPTZ</td></tr></table>>];
+
+  sectors:pk:e -> companies:fk:w;
+  companies:pk:e -> financial_statements:fk:w;
+  companies:pk:e -> market_data:fk:w;
+  companies:pk:e -> company_embeddings:fk:w [arrowhead=tee];
+  users:pk:e -> comp_sets:fk1:w;
+  companies:pk:e -> comp_sets:fk2:w;
+  comp_sets:pk:e -> comp_set_members:fk1:w;
+  companies:pk:e -> comp_set_members:fk2:w;
+  { rank=same; financial_statements; market_data; company_embeddings; comp_sets; }
+  { rank=same; sectors; users; }
+}

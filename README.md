@@ -52,7 +52,9 @@ DBMS Experiential Learning Level 3 project, PES University.
    ```bash
    python ingest/apply_sql.py
    ```
-   To wipe everything and start over: `python ingest/apply_sql.py --reset`
+   To wipe everything and start over: `python ingest/apply_sql.py --reset`.
+   To add a single new file to an existing database (e.g. the roles file):
+   `python ingest/apply_sql.py --only 07_roles.sql`
 
 7. Load real financials, prices and business descriptions (Yahoo Finance):
    ```bash
@@ -77,7 +79,33 @@ DBMS Experiential Learning Level 3 project, PES University.
    Deals live in `ingest/deals.json` (hand-compiled from public announcements);
    add more there and re-run. `--stats` prints only the aggregation results.
 
-Later phases (web app) will add their own steps below.
+10. Set up and start the web app (from the `web/` folder):
+    ```bash
+    cd web
+    npm install
+    copy env.local.example .env.local       # macOS/Linux: cp
+    # edit .env.local: same passwords/ports as the root .env, plus a long AUTH_SECRET
+    npm run create-admin -- you@example.com "a-strong-password" "Your Name"
+    npm run dev
+    ```
+    Open http://localhost:3000. Anyone can register as an **analyst** (read-only);
+    **admins** are created only with `create-admin` and can record financials.
+
+## Web app
+
+| Page | What it shows | Databases |
+|---|---|---|
+| `/` | All companies with latest multiples, sortable | Postgres view `latest_multiples` |
+| `/company/<ticker>` | Sector comps + sector median, similar businesses, deal history | Postgres, pgvector, MongoDB |
+| `/search?q=` | Full-text search over descriptions | Postgres `tsvector` + GIN index |
+| `/sectors` | Sector medians and deal activity | Postgres view + MongoDB aggregation |
+| `/admin` | Record financials (transactional procedure) and the audit log | Postgres procedure + triggers |
+
+JSON API (all require login): `/api/companies`, `/api/comps?ticker=`, `/api/similar?ticker=`,
+`/api/deals?ticker=`, `/api/search?q=`, `/api/sectors`; admin only: `POST /api/admin/financials`,
+`/api/admin/audit`. Access rules are enforced three times: in `web/middleware.js` for every
+request, again inside each admin route, and by PostgreSQL itself, because every request runs
+under the database role `app_analyst` or `app_admin` (see `db/07_roles.sql`).
 
 ## Database files (`db/`)
 
@@ -89,8 +117,20 @@ Later phases (web app) will add their own steps below.
 | `04_triggers.sql` | Audit log, financial validation, `updated_at` |
 | `05_alter_demo.sql` | ALTER / CREATE INDEX / DROP INDEX examples |
 | `06_seed.sql` | 3 sectors, 19 NSE companies |
+| `07_roles.sql` | Database roles `app_analyst` (read-only) and `app_admin`, with GRANT/REVOKE |
 
-ER diagram source: `docs/schema.dbml` (paste into dbdiagram.io).
+Demo scripts in `db/queries/` (all undo their own changes, so they are safe to run any time):
+
+| File | Run with |
+|---|---|
+| `demo_queries.sql` | join, nested, correlated, EXISTS, recursive CTE, CTE + window functions, GROUP BY/HAVING: `docker compose exec -T postgres psql -U comps_admin -d comps_engine < db/queries/demo_queries.sql` |
+| `demo_dml.sql` | INSERT / UPDATE / DELETE / procedure, rolled back: same command with this file |
+| `vector_commands.sql` | pgvector read / update / delete: same command with this file |
+| `mongo_commands.js` | MongoDB read / update / delete / aggregate: `docker compose exec -T mongo mongosh -u comps_admin -p <password> --authenticationDatabase admin comps_engine --quiet < db/queries/mongo_commands.js` |
+
+Diagrams: `docs/er.png` (ER, Chen notation) and `docs/schema.png` (relational schema), generated
+from `docs/er.dot` and `docs/schema.dot` with Graphviz; `docs/schema.dbml` opens in dbdiagram.io.
+Project report: `docs/Comps_Engine_Project_Report.docx`.
 All amounts are in INR crore. Banks use P/E and P/B; EV-based multiples are NULL for them by design.
 
 ## Project structure

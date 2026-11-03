@@ -1,8 +1,9 @@
 """Apply the SQL files in db/ to the Postgres container, in order.
 
 Run from the repo root:
-    python ingest/apply_sql.py            # apply 01..06 (fails if already applied)
-    python ingest/apply_sql.py --reset    # wipe the public schema first, then apply
+    python ingest/apply_sql.py                     # apply 01..07 (fails if already applied)
+    python ingest/apply_sql.py --reset             # wipe the public schema first, then apply
+    python ingest/apply_sql.py --only 07_roles.sql # apply just one file to an existing database
 """
 import argparse
 import os
@@ -18,9 +19,17 @@ load_dotenv(ROOT / ".env")
 parser = argparse.ArgumentParser()
 parser.add_argument("--reset", action="store_true",
                     help="DROP SCHEMA public CASCADE first (deletes all data)")
+parser.add_argument("--only", metavar="FILE", nargs="+",
+                    help="apply only these files from db/ (e.g. 07_roles.sql)")
 args = parser.parse_args()
 
 files = sorted((ROOT / "db").glob("[0-9][0-9]_*.sql"))
+if args.only:
+    wanted = set(args.only)
+    files = [f for f in files if f.name in wanted]
+    missing = wanted - {f.name for f in files}
+    if missing:
+        sys.exit(f"Not found in db/: {', '.join(sorted(missing))}")
 if not files:
     sys.exit("No SQL files found in db/")
 
