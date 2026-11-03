@@ -1,0 +1,42 @@
+digraph arch {
+  graph [rankdir=LR, bgcolor="white", pad=0.3, nodesep=0.35, ranksep=0.7, fontname="Helvetica", fontsize=11, compound=true];
+  node  [fontname="Helvetica", fontsize=10.5, shape=box, style="rounded,filled", fillcolor="#ffffff", color="#555555", penwidth=1.2];
+  edge  [fontname="Helvetica", fontsize=9, color="#555555", fontcolor="#444444"];
+
+  user [label="Analyst / Admin\n(web browser)", fillcolor="#f3f3f1"];
+
+  subgraph cluster_app {
+    label="Next.js 14 application"; style="rounded,filled"; fillcolor="#eef5f3"; color="#0f5c4d"; fontcolor="#0f5c4d";
+    mw    [label="middleware.js\nlogin check + role check\n(every request)"];
+    pages [label="Server-rendered pages\n/  /company/[ticker]\n/search  /sectors  /admin"];
+    api   [label="API route handlers\n/api/auth/*  /api/comps\n/api/similar  /api/deals\n/api/admin/*"];
+    lib   [label="lib/db.js · lib/queries.js · lib/mongo.js\nparameterised SQL, one transaction per request\nSET LOCAL ROLE app_analyst | app_admin"];
+  }
+
+  subgraph cluster_data {
+    label="Docker Compose"; style="rounded,filled"; fillcolor="#fbf7ef"; color="#8a6d00"; fontcolor="#8a6d00";
+    pg    [label="PostgreSQL 16 + pgvector\ntables · views · procedure · triggers\nroles app_analyst / app_admin\ncompany_embeddings (HNSW)", fillcolor="#e3efeb", color="#0f5c4d"];
+    mongo [label="MongoDB 7\ncollection deals\n$jsonSchema validator · indexes", fillcolor="#fdeee6", color="#9a3412"];
+  }
+
+  subgraph cluster_ingest {
+    label="Python ingestion (ingest/)"; style="rounded,filled"; fillcolor="#f5f5f5"; color="#777777"; fontcolor="#555555";
+    yf    [label="Yahoo Finance\n(cached in ingest/cache)", shape=cylinder, fillcolor="#ffffff"];
+    lf    [label="load_financials.py\nINR crore, USD→INR"];
+    emb   [label="embed.py\nall-MiniLM-L6-v2\n384-dim vectors"];
+    dj    [label="deals.json", shape=note];
+    ld    [label="load_deals.py\nticker check vs Postgres"];
+  }
+
+  user -> mw [label="HTTPS\nhttpOnly JWT cookie"];
+  mw -> pages; mw -> api;
+  pages -> lib; api -> lib;
+  lib -> pg [label="SQL + vector search"];
+  lib -> mongo [label="find / aggregate"];
+  yf -> lf [label="download"];
+  lf -> pg [label="CALL record_financials"];
+  pg -> emb [label="descriptions", style=dashed];
+  emb -> pg [label="vectors"];
+  dj -> ld -> mongo;
+  ld -> pg [label="validate tickers", style=dashed, dir=back];
+}

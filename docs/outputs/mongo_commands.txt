@@ -1,0 +1,196 @@
+comps_engine> 
+comps_engine> 
+comps_engine> 
+comps_engine> 
+comps_engine> 
+comps_engine> 
+comps_engine> 
+comps_engine> 
+== READ: Eternal's deals, newest first (uses index ix_ticker_date)
+
+comps_engine> | | | [
+  {
+    headline: 'Zomato raises Rs 8,500 crore through a QIP',
+    date: ISODate('2024-11-25T00:00:00.000Z'),
+    type: 'fundraise'
+  },
+  {
+    headline: "Zomato buys Paytm's entertainment ticketing business",
+    date: ISODate('2024-08-21T00:00:00.000Z'),
+    type: 'acquisition'
+  },
+  {
+    headline: 'Zomato acquires Blinkit (formerly Grofers)',
+    date: ISODate('2022-06-24T00:00:00.000Z'),
+    type: 'acquisition'
+  },
+  {
+    headline: 'Zomato acquires Uber Eats India',
+    date: ISODate('2020-01-21T00:00:00.000Z'),
+    type: 'acquisition'
+  }
+]
+
+comps_engine> 
+comps_engine> 
+== READ: all-stock acquisitions (query inside a nested field)
+
+comps_engine> | | | [
+  {
+    ticker: 'ETERNAL.NS',
+    deal: {
+      target: 'Uber Eats India'
+    }
+  },
+  {
+    ticker: 'ETERNAL.NS',
+    deal: {
+      target: 'Blinkit Commerce'
+    }
+  },
+  {
+    ticker: 'SWIGGY.NS',
+    deal: {
+      target: 'Dineout (Times Internet)'
+    }
+  }
+]
+
+comps_engine> 
+comps_engine> 
+== READ: full-text search for 'quick commerce' (text index ix_text)
+
+comps_engine> | | | [
+  {
+    headline: 'Zomato acquires Blinkit (formerly Grofers)',
+    ticker: 'ETERNAL.NS',
+    score: 2.590909090909091
+  },
+  {
+    headline: 'Zomato raises Rs 8,500 crore through a QIP',
+    ticker: 'ETERNAL.NS',
+    score: 1.1
+  },
+  {
+    headline: 'FSN E-Commerce (Nykaa) lists after Rs 5,352 crore IPO',
+    ticker: 'NYKAA.NS',
+    score: 0.55
+  }
+]
+
+comps_engine> 
+comps_engine> 
+== UPDATE: add a tag to one deal ($addToSet avoids duplicates)
+
+comps_engine> | | | {
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+comps_engine> | | {
+  headline: 'Zomato acquires Blinkit (formerly Grofers)',
+  tags: [
+    'quick commerce',
+    'all-stock',
+    'related party',
+    'demo-tag'
+  ],
+  reviewed: true
+}
+
+comps_engine> 
+comps_engine> 
+== UPDATE (many): flag every IPO as a listing event
+
+comps_engine> {
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 3,
+  modifiedCount: 3,
+  upsertedCount: 0
+}
+
+comps_engine> 
+comps_engine> 
+== VALIDATION: an unknown deal type is rejected by the $jsonSchema validator
+
+comps_engine> | | | | | Rejected: Document failed validation
+
+comps_engine> 
+comps_engine> 
+== DELETE: insert a temporary deal, then delete it
+
+comps_engine> | {
+  acknowledged: true,
+  insertedId: ObjectId('6ae96cd497b7d03c8ff23676')
+}
+comps_engine> {
+  acknowledged: true,
+  deletedCount: 1
+}
+
+comps_engine> 
+comps_engine> 
+== AGGREGATE: deal count and disclosed value per sector
+
+comps_engine> | | | | [
+  {
+    _id: 'Consumer Internet',
+    deals: 8,
+    disclosed_inr_cr: 6495
+  },
+  {
+    _id: 'Private Banks',
+    deals: 3,
+    disclosed_inr_cr: 12325
+  },
+  {
+    _id: 'IT Services',
+    deals: 3,
+    disclosed_inr_cr: 0
+  }
+]
+
+comps_engine> 
+comps_engine> 
+== AGGREGATE: most common deal themes ($unwind the tags array)
+
+comps_engine> | | | | | [
+  {
+    _id: 'IPO',
+    count: 3
+  },
+  {
+    _id: 'cash',
+    count: 3
+  },
+  {
+    _id: 'listing',
+    count: 3
+  },
+  {
+    _id: 'all-stock',
+    count: 2
+  },
+  {
+    _id: 'merger',
+    count: 2
+  }
+]
+
+comps_engine> 
+comps_engine> 
+comps_engine> {
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 14,
+  modifiedCount: 4,
+  upsertedCount: 0
+}
+comps_engine> 
+Demo changes undone. Documents in collection: 14
+
+comps_engine> 

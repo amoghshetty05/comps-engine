@@ -1,0 +1,40 @@
+ vectors | dims | avg_length 
+---------+------+------------
+      19 |  384 |     1.0000
+(1 row)
+
+    ticker     | similarity 
+---------------+------------
+ LTM.NS        |      0.530
+ TCS.NS        |      0.483
+ PERSISTENT.NS |      0.461
+ INFY.NS       |      0.453
+ COFORGE.NS    |      0.451
+(5 rows)
+
+      sector       | other_sector  | similarity 
+-------------------+---------------+------------
+ Consumer Internet | IT Services   |      0.726
+ Consumer Internet | Private Banks |      0.677
+ IT Services       | Private Banks |      0.597
+(3 rows)
+
+BEGIN
+ company_id |                      model_name                       
+------------+-------------------------------------------------------
+          8 | sentence-transformers/all-MiniLM-L6-v2 (renormalised)
+(1 row)
+
+UPDATE 1
+ company_id 
+------------
+         12
+(1 row)
+
+DELETE 1
+ vectors_after_delete 
+----------------------
+                   18
+(1 row)
+
+ROLLBACK
